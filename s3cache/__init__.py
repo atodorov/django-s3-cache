@@ -13,7 +13,7 @@ try:
 except ImportError:
     import pickle
 
-import storages.backends.s3boto
+from storages.backends import s3boto
 from django.core.cache.backends.base import BaseCache
 
 class AmazonS3Cache(BaseCache):
