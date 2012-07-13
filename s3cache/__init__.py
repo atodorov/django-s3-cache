@@ -17,7 +17,11 @@ import storages.backends.s3boto
 from django.core.cache.backends.base import BaseCache
 
 class AmazonS3Cache(BaseCache):
-    def __init__(self, params):
+    def __init__(self, location=None, params):
+        """
+            location is not used but otherwise Django crashes.
+        """
+
         BaseCache.__init__(self, params)
 
         # looks like Amazon or boto has a maximum limit of 1000 for
