@@ -65,10 +65,16 @@ values as cache options explicitly if you don't want to run into problems.
 Some notable options are:
 
 * *LOCATION* - the directory prefix under which to store cache files. Defaults to empty string, which means the root directory;
-* *DEFAULT_ACL* ==*private* - default ACL for created objects. Unlike the *s3boto* storage backend we set this to *private*;
-* *BUCKET_ACL*==*DEFAULT_ACL* - ACL for the bucket if auto created. By default set to *private*. It's best to use separate bucket for cache files;
+* *DEFAULT_ACL* == *private* - default ACL for created objects. Unlike the *s3boto* storage backend we set this to *private*;
+* *BUCKET_ACL* == *DEFAULT_ACL* - ACL for the bucket if auto created. By default set to *private*. It's best to use separate bucket for cache files;
 * *REDUCED_REDUNDANCY* - set to *True* if you want to save a few cents on storage costs;
 * *IS_GZIPPED* - set to *True* to enable Gzip compression. Used together with *GZIP_CONTENT_TYPES*. See *django-storages* `documentation <http://django-storages.readthedocs.org/en/latest/backends/amazon-S3.html>`_.
+
+
+Django S3 implements culling strategy similar to the stock filesystem backends. It will honor the following options:
+
+* *MAX_ENTRIES* - the maximum number of entries allowed in the cache before old values are deleted. This argument defaults to 300;
+* *CULL_FREQUENCY* - the fraction of entries that are culled when *MAX_ENTRIES* is reached. The actual ratio is *1/CULL_FREQUENCY*, so set *CULL_FREQUENCY* to 2 to cull half of the entries when *MAX_ENTRIES* is reached;
 
 
 Contibuting
