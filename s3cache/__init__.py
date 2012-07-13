@@ -14,7 +14,6 @@ except ImportError:
     import pickle
 
 import storages.backends.s3boto
-from django.core.files.base import ContentFile
 from django.core.cache.backends.base import BaseCache
 
 class AmazonS3Cache(BaseCache):
