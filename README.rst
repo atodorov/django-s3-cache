@@ -23,16 +23,6 @@ Use pip to install from PyPI:
 
         pip install django-s3-cache
 
-Add *s3cache* to your *settings.py* file:
-
-::
-
-        INSTALLED_APPS = (
-            ...
-            's3cache',
-            ...
-        )
-
 
 Configure the use of this backend:
 
