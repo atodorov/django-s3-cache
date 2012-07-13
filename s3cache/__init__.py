@@ -14,6 +14,7 @@ except ImportError:
     import pickle
 
 from storages.backends import s3boto
+from django.core.files.base import ContentFile
 from django.core.cache.backends.base import BaseCache
 
 class AmazonS3Cache(BaseCache):
@@ -113,13 +114,10 @@ class AmazonS3Cache(BaseCache):
         self._cull()
 
         try:
-            f = self._storage.open(fname, 'wb')
-            try:
-                now = time.time()
-                pickle.dump(now + timeout, f, pickle.HIGHEST_PROTOCOL)
-                pickle.dump(value, f, pickle.HIGHEST_PROTOCOL)
-            finally:
-                f.close()
+            now = time.time()
+            content = pickle.dumps(now + timeout, pickle.HIGHEST_PROTOCOL)
+            content += pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
+            self._storage.save(fname, ContentFile(content))
         except (IOError, OSError, EOFError, pickle.PickleError):
             pass
 
