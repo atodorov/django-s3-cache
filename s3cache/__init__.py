@@ -28,31 +28,47 @@ class AmazonS3Cache(BaseCache):
 
         self._options = params.get('OPTIONS', {})
 
-        _ACCESS_KEY_NAME     = self._options.get('MAX_ENTRIES', s3boto.ACCESS_KEY_NAME)
-        _SECRET_KEY_NAME     = self._options.get('AWS_SECRET_ACCESS_KEY', s3boto.AWS_SECRET_ACCESS_KEY)
-        _HEADERS             = self._options.get('AWS_HEADERS', s3boto.AWS_HEADERS)
-        _STORAGE_BUCKET_NAME = self._options.get('AWS_STORAGE_BUCKET_NAME', s3boto.AWS_STORAGE_BUCKET_NAME)
-        _AUTO_CREATE_BUCKET  = self._options.get('AWS_AUTO_CREATE_BUCKET', s3boto.AWS_AUTO_CREATE_BUCKET)
-#todo: make objects private, not public by default
-#todo: add path prefix if not configured
-        _DEFAULT_ACL         = self._options.get('AWS_DEFAULT_ACL', s3boto.AWS_DEFAULT_ACL)
-        _BUCKET_ACL          = self._options.get('AWS_BUCKET_ACL', s3boto.AWS_BUCKET_ACL)
-        _QUERYSTRING_AUTH    = self._options.get('AWS_QUERYSTRING_AUTH', s3boto.AWS_QUERYSTRING_AUTH)
-        _QUERYSTRING_EXPIRE  = self._options.get('AWS_QUERYSTRING_EXPIRE', s3boto.AWS_QUERYSTRING_EXPIRE)
-        _REDUCED_REDUNDANCY  = self._options.get('AWS_REDUCED_REDUNDANCY', s3boto.AWS_REDUCED_REDUNDANCY)
-        _LOCATION            = self._options.get('AWS_LOCATION', s3boto.AWS_LOCATION)
-        _CUSTOM_DOMAIN       = self._options.get('AWS_S3_CUSTOM_DOMAIN', s3boto.AWS_S3_CUSTOM_DOMAIN)
-        _CALLING_FORMAT      = self._options.get('AWS_S3_CALLING_FORMAT', s3boto.AWS_S3_CALLING_FORMAT)
-        _SECURE_URLS         = self._options.get('AWS_S3_SECURE_URLS', s3boto.AWS_S3_SECURE_URLS)
-        _FILE_NAME_CHARSET   = self._options.get('AWS_S3_FILE_NAME_CHARSET', s3boto.AWS_S3_FILE_NAME_CHARSET)
-        _FILE_OVERWRITE      = self._options.get('AWS_S3_FILE_OVERWRITE', s3boto.AWS_S3_FILE_OVERWRITE)
-        _IS_GZIPPED          = self._options.get('AWS_IS_GZIPPED', s3boto.AWS_IS_GZIPPED)
-        _PRELOAD_METADATA    = self._options.get('AWS_PRELOAD_METADATA', s3boto.AWS_PRELOAD_METADATA)
+        _ACCESS_KEY_ID       = self._options.get('ACCESS_KEY_ID', s3boto.ACCESS_KEY_NAME) # NB _ID vs. _NAME
+        _SECRET_KEY_NAME     = self._options.get('SECRET_KEY_NAME', s3boto.SECRET_KEY_NAME)
+        _HEADERS             = self._options.get('HEADERS', s3boto.HEADERS)
+        _STORAGE_BUCKET_NAME = self._options.get('STORAGE_BUCKET_NAME', s3boto.STORAGE_BUCKET_NAME)
+        _AUTO_CREATE_BUCKET  = self._options.get('AUTO_CREATE_BUCKET', s3boto.AUTO_CREATE_BUCKET)
+        _DEFAULT_ACL         = self._options.get('DEFAULT_ACL', 'private')
+        _BUCKET_ACL          = self._options.get('BUCKET_ACL', _DEFAULT_ACL)
+        _QUERYSTRING_AUTH    = self._options.get('QUERYSTRING_AUTH', s3boto.QUERYSTRING_AUTH)
+        _QUERYSTRING_EXPIRE  = self._options.get('QUERYSTRING_EXPIRE', s3boto.QUERYSTRING_EXPIRE)
+        _REDUCED_REDUNDANCY  = self._options.get('REDUCED_REDUNDANCY', s3boto.REDUCED_REDUNDANCY)
+        _LOCATION            = self._options.get('LOCATION', s3boto.LOCATION)
+        _CUSTOM_DOMAIN       = self._options.get('CUSTOM_DOMAIN', s3boto.CUSTOM_DOMAIN)
+        _CALLING_FORMAT      = self._options.get('CALLING_FORMAT', s3boto.CALLING_FORMAT)
+        _SECURE_URLS         = self._options.get('SECURE_URLS', s3boto.SECURE_URLS)
+        _FILE_NAME_CHARSET   = self._options.get('FILE_NAME_CHARSET', s3boto.FILE_NAME_CHARSET)
+        _FILE_OVERWRITE      = self._options.get('FILE_OVERWRITE', s3boto.FILE_OVERWRITE)
+        _IS_GZIPPED          = self._options.get('IS_GZIPPED', s3boto.IS_GZIPPED)
+        _PRELOAD_METADATA    = self._options.get('PRELOAD_METADATA', s3boto.PRELOAD_METADATA)
         _GZIP_CONTENT_TYPES  = self._options.get('GZIP_CONTENT_TYPES', s3boto.GZIP_CONTENT_TYPES)
 
 
-        self._storage = s3boto.S3BotoStorage()   # todo
-#todo: initialize S3 bucket and proper access credentials
+        self._storage = s3boto.S3BotoStorage(
+                                    bucket=_STORAGE_BUCKET_NAME,
+                                    access_key=_ACCESS_KEY_ID,
+                                    secret_key=_SECRET_KEY_NAME,
+                                    bucket_acl=_BUCKET_ACL,
+                                    acl=_DEFAULT_ACL,
+                                    headers=_HEADERS,
+                                    gzip=_IS_GZIPPED,
+                                    gzip_content_types=_GZIP_CONTENT_TYPES,
+                                    querystring_auth=_QUERYSTRING_AUTH,
+                                    querystring_expire=_QUERYSTRING_EXPIRE,
+                                    reduced_redundancy=_REDUCED_REDUNDANCY,
+                                    custom_domain=_CUSTOM_DOMAIN,
+                                    secure_urls=_SECURE_URLS,
+                                    location=_LOCATION,
+                                    file_name_charset=_FILE_NAME_CHARSET,
+                                    preload_metadata=_PRELOAD_METADATA,
+                                    calling_format=_CALLING_FORMAT
+                                )
+
 
     def add(self, key, value, timeout=None, version=None):
         if self.has_key(key, version=version):
