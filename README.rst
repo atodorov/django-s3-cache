@@ -8,7 +8,7 @@ This is Amazon Simple Storage Service (S3) cache backend for Django.
 It is based on the *django.core.cache.backends.filebased.FileBasedCache* backend
 and operates in similar fashion. This backend uses
 `django-storages <http://pypi.python.org/pypi/django-storages>`_ to read/write the
-date into S3. It uses the *s3boto* storage backend.
+data into S3. It uses the *s3boto* storage backend.
 
 All key/values passed to this backend are stored in a flat directory structure
 in your S3 bucket. It uses sha1 instead of md5 to create the file name because
