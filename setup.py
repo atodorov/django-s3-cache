@@ -7,7 +7,7 @@ with open('README.rst') as file:
 
 setup(
     name = 'django-s3-cache',
-    version = '0.2',
+    version = '0.3',
     packages = find_packages(),
     author = 'Alexander Todorov',
     author_email = 'atodorov@nospam.otb.bg',
