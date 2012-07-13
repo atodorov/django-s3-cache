@@ -31,8 +31,9 @@ class AmazonS3Cache(BaseCache):
 
         self._options = params.get('OPTIONS', {})
 
+        # we use S3 compatible varibale names while django-storages doesn't
         _ACCESS_KEY_ID       = self._options.get('ACCESS_KEY_ID', s3boto.ACCESS_KEY_NAME) # NB _ID vs. _NAME
-        _SECRET_KEY_NAME     = self._options.get('SECRET_KEY_NAME', s3boto.SECRET_KEY_NAME)
+        _SECRET_ACCESS_KEY   = self._options.get('SECRET_ACCESS_KEY', s3boto.SECRET_KEY_NAME) # NB _ACCESS_KEY vs. _KEY_NAME
         _HEADERS             = self._options.get('HEADERS', s3boto.HEADERS)
         _STORAGE_BUCKET_NAME = self._options.get('STORAGE_BUCKET_NAME', s3boto.STORAGE_BUCKET_NAME)
         _AUTO_CREATE_BUCKET  = self._options.get('AUTO_CREATE_BUCKET', s3boto.AUTO_CREATE_BUCKET)
@@ -55,7 +56,7 @@ class AmazonS3Cache(BaseCache):
         self._storage = s3boto.S3BotoStorage(
                                     bucket=_STORAGE_BUCKET_NAME,
                                     access_key=_ACCESS_KEY_ID,
-                                    secret_key=_SECRET_KEY_NAME,
+                                    secret_key=_SECRET_ACCESS_KEY,
                                     bucket_acl=_BUCKET_ACL,
                                     acl=_DEFAULT_ACL,
                                     headers=_HEADERS,
