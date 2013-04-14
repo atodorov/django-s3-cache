@@ -27,6 +27,7 @@ class AmazonS3Cache(BaseCache):
 
         # looks like Amazon or boto has a maximum limit of 1000 for
         # get_all_keys() which is not documented, so we play it safe here.
+    
         if self._max_entries > 1000:
             self._max_entries = 1000
 
@@ -152,7 +153,10 @@ class AmazonS3Cache(BaseCache):
             return False
 
     def _cull(self):
-        if int(self._num_entries) < self._max_entries:
+
+        if not self._max_entries:
+            return
+        elif int(self._num_entries) < self._max_entries:
             return
 
         try:
