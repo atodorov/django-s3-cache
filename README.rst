@@ -63,7 +63,7 @@ Some notable options are:
 
 Django S3 implements culling strategy similar to the stock filesystem backend. It will honor the following options:
 
-* *MAX_ENTRIES* - the maximum number of entries allowed in the cache before old values are deleted. This argument defaults to 300;
+* *MAX_ENTRIES* - the maximum number of entries allowed in the cache before old values are deleted. If 0 culling is disabled. This argument defaults to 300;
 * *CULL_FREQUENCY* - the fraction of entries that are culled when *MAX_ENTRIES* is reached. The actual ratio is *1/CULL_FREQUENCY*, so set *CULL_FREQUENCY* to 2 to cull half of the entries when *MAX_ENTRIES* is reached;
 
 
