@@ -63,8 +63,7 @@ Some notable options are:
 * *DEFAULT_ACL* == *private* - default ACL for created objects. Unlike the *s3boto* storage backend we set this to *private*;
 * *BUCKET_ACL* == *DEFAULT_ACL* - ACL for the bucket if auto created. By default set to *private*. It's best to use separate bucket for cache files;
 * *REDUCED_REDUNDANCY* - set to *True* if you want to save a few cents on storage costs;
-* *IS_GZIPPED* - set to *True* to enable Gzip compression. Used together with *GZIP_CONTENT_TYPES*.
-See *django-storages* `documentation <http://django-storages.readthedocs.org/en/latest/backends/amazon-S3.html>`_.
+* *IS_GZIPPED* - set to *True* to enable Gzip compression. Used together with *GZIP_CONTENT_TYPES*. See *django-storages* `documentation <http://django-storages.readthedocs.org/en/latest/backends/amazon-S3.html>`_.
 
 
 Django S3 implements culling strategy similar to the stock filesystem backend. It will honor the following options:
