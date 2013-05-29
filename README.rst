@@ -53,7 +53,7 @@ values as cache options explicitly if you don't want to run into problems.
 **NB:** since version 1.2 Django S3 Cache is compatible with django-storages v1.1.8 which
 has changed the names of configuration variables. All new variables are expected to be lower
 case and the AWS keys variables changed names. For exact names see the S3BotoStorage class
-definitio in *s3boto.py*. Django S3 Cache implements backward compatibility with its previous
+definition in *s3boto.py*. Django S3 Cache implements backward compatibility with its previous
 OPTIONS syntax to allow for easier upgrades. Older names are mapped to new ones and all
 options are lower cased before passing to S3BotoStorage. The example above shows the new syntax.
 
@@ -73,7 +73,7 @@ Django S3 implements culling strategy similar to the stock filesystem backend. I
 * *CULL_FREQUENCY* - the fraction of entries that are culled when *MAX_ENTRIES* is reached. The actual ratio is *1/CULL_FREQUENCY*, so set *CULL_FREQUENCY* to 2 to cull half of the entries when *MAX_ENTRIES* is reached;
 
 
-Contibuting
-===========
+Contributing
+============
 
 Source code and issue tracker are at https://github.com/atodorov/django-s3-cache
