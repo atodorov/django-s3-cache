@@ -33,46 +33,29 @@ class AmazonS3Cache(BaseCache):
 
         self._options = params.get('OPTIONS', {})
 
-        # we use S3 compatible varibale names while django-storages doesn't
-        _ACCESS_KEY_ID       = self._options.get('ACCESS_KEY_ID', s3boto.ACCESS_KEY_NAME) # NB _ID vs. _NAME
-        _SECRET_ACCESS_KEY   = self._options.get('SECRET_ACCESS_KEY', s3boto.SECRET_KEY_NAME) # NB _ACCESS_KEY vs. _KEY_NAME
-        _HEADERS             = self._options.get('HEADERS', s3boto.HEADERS)
-        _STORAGE_BUCKET_NAME = self._options.get('STORAGE_BUCKET_NAME', s3boto.STORAGE_BUCKET_NAME)
-        _AUTO_CREATE_BUCKET  = self._options.get('AUTO_CREATE_BUCKET', s3boto.AUTO_CREATE_BUCKET)
-        _DEFAULT_ACL         = self._options.get('DEFAULT_ACL', 'private')
-        _BUCKET_ACL          = self._options.get('BUCKET_ACL', _DEFAULT_ACL)
-        _QUERYSTRING_AUTH    = self._options.get('QUERYSTRING_AUTH', s3boto.QUERYSTRING_AUTH)
-        _QUERYSTRING_EXPIRE  = self._options.get('QUERYSTRING_EXPIRE', s3boto.QUERYSTRING_EXPIRE)
-        _REDUCED_REDUNDANCY  = self._options.get('REDUCED_REDUNDANCY', s3boto.REDUCED_REDUNDANCY)
-        _LOCATION            = self._options.get('LOCATION', s3boto.LOCATION)
-        _CUSTOM_DOMAIN       = self._options.get('CUSTOM_DOMAIN', s3boto.CUSTOM_DOMAIN)
-        _CALLING_FORMAT      = self._options.get('CALLING_FORMAT', s3boto.CALLING_FORMAT)
-        _SECURE_URLS         = self._options.get('SECURE_URLS', s3boto.SECURE_URLS)
-        _FILE_NAME_CHARSET   = self._options.get('FILE_NAME_CHARSET', s3boto.FILE_NAME_CHARSET)
-        _FILE_OVERWRITE      = self._options.get('FILE_OVERWRITE', s3boto.FILE_OVERWRITE)
-        _IS_GZIPPED          = self._options.get('IS_GZIPPED', s3boto.IS_GZIPPED)
-        _PRELOAD_METADATA    = self._options.get('PRELOAD_METADATA', s3boto.PRELOAD_METADATA)
-        _GZIP_CONTENT_TYPES  = self._options.get('GZIP_CONTENT_TYPES', s3boto.GZIP_CONTENT_TYPES)
+        # backward compatible syntax for s3cache users before v1.2 for easy upgrades
+        # in v1.2 we update to latest django-storages 1.1.8 which changes variable names
+        # in non-backward compatible fashion
+        self._options['ACCESS_KEY'] = self._options.get('ACCESS_KEY_ID', None)
+        self._options['SECRET_KEY'] = self._options.get('SECRET_ACCESS_KEY', None)
+        self._options['BUCKET_NAME'] = self._options.get('STORAGE_BUCKET_NAME', None)
 
+        # we use S3 compatible varibale names while django-storages doesn't
+        _BUCKET_NAME = self._options.get('BUCKET_NAME', None)
+        _DEFAULT_ACL = self._options.get('DEFAULT_ACL', 'private')
+        _BUCKET_ACL  = self._options.get('BUCKET_ACL', _DEFAULT_ACL)
+        # in case it was not specified in OPTIONS default to 'private'
+        self._options['BUCKET_ACL'] = _BUCKET_ACL
+
+        # S3BotoStorage wants lower case names
+        for name, value in self._options.items():
+            if value is not None: # skip None values
+                self._options[name.lower()] = value
 
         self._storage = s3boto.S3BotoStorage(
-                                    bucket=_STORAGE_BUCKET_NAME,
-                                    access_key=_ACCESS_KEY_ID,
-                                    secret_key=_SECRET_ACCESS_KEY,
-                                    bucket_acl=_BUCKET_ACL,
                                     acl=_DEFAULT_ACL,
-                                    headers=_HEADERS,
-                                    gzip=_IS_GZIPPED,
-                                    gzip_content_types=_GZIP_CONTENT_TYPES,
-                                    querystring_auth=_QUERYSTRING_AUTH,
-                                    querystring_expire=_QUERYSTRING_EXPIRE,
-                                    reduced_redundancy=_REDUCED_REDUNDANCY,
-                                    custom_domain=_CUSTOM_DOMAIN,
-                                    secure_urls=_SECURE_URLS,
-                                    location=_LOCATION,
-                                    file_name_charset=_FILE_NAME_CHARSET,
-                                    preload_metadata=_PRELOAD_METADATA,
-                                    calling_format=_CALLING_FORMAT
+                                    bucket=_BUCKET_NAME,
+                                    **self._options
                                 )
 
 
