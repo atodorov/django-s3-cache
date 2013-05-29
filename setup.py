@@ -26,5 +26,5 @@ setup(
         'Framework :: Django',
     ],
     zip_safe = False,
-    install_requires=['boto','django-storages','Django']
+    install_requires=['boto','django-storages>=1.1.8','Django']
 )
