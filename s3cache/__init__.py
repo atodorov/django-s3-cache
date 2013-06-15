@@ -25,8 +25,9 @@ class AmazonS3Cache(BaseCache):
 
         BaseCache.__init__(self, params)
 
-        # looks like Amazon or boto has a maximum limit of 1000 for
-        # get_all_keys() which is not documented, so we play it safe here.
+        # Amazon and boto has a maximum limit of 1000 for get_all_keys(). See:
+        # http://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGET.html
+        # This implementation of the GET operation returns some or all (up to 1000) of the objects in a bucket....
     
         if self._max_entries > 1000:
             self._max_entries = 1000
