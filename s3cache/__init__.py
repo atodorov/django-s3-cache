@@ -28,7 +28,7 @@ class AmazonS3Cache(BaseCache):
         # Amazon and boto has a maximum limit of 1000 for get_all_keys(). See:
         # http://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGET.html
         # This implementation of the GET operation returns some or all (up to 1000) of the objects in a bucket....
-    
+
         if self._max_entries > 1000:
             self._max_entries = 1000
 
@@ -47,6 +47,18 @@ class AmazonS3Cache(BaseCache):
         _BUCKET_ACL  = self._options.get('BUCKET_ACL', _DEFAULT_ACL)
         # in case it was not specified in OPTIONS default to 'private'
         self._options['BUCKET_ACL'] = _BUCKET_ACL
+
+        # sanitize location by removing leading and traling slashes
+        self._LOCATION = self._options.get('LOCATION', self._options.get('location', ''))
+
+        while self._LOCATION.startswith('/'):
+            self._LOCATION = self._LOCATION[1:]
+
+        while self._LOCATION.endswith('/'):
+            self._LOCATION = self._LOCATION[:-1]
+
+        # overwrite value specified by user
+        self._options['LOCATION'] = self._LOCATION
 
         # S3BotoStorage wants lower case names
         for name, value in self._options.items():
@@ -144,7 +156,7 @@ class AmazonS3Cache(BaseCache):
             return
 
         try:
-            keylist = self._storage.bucket.get_all_keys()
+            keylist = self._storage.bucket.get_all_keys(prefix=self._LOCATION)
         except:
             return
 
@@ -167,6 +179,9 @@ class AmazonS3Cache(BaseCache):
 
             NB: measuring sha1() with timeit shows it is a bit faster compared to md5()
             http://stackoverflow.com/questions/2241013/is-there-a-significant-overhead-by-using-different-versions-of-sha-hashing-hash
+
+            UPDATE: this is wrong, md5() is still faster, see:
+            http://atodorov.org/blog/2013/02/05/performance-test-md5-sha1-sha256-sha512/
         """
         return hashlib.sha1(key).hexdigest()
 
@@ -174,12 +189,12 @@ class AmazonS3Cache(BaseCache):
         """
             There seems to be an artificial limit of 1000
         """
-        return len(self._storage.bucket.get_all_keys())
+        return len(self._storage.bucket.get_all_keys(prefix=self._LOCATION))
     _num_entries = property(_get_num_entries)
 
     def clear(self):
         try:
-            all_keys = self._storage.bucket.get_all_keys()
+            all_keys = self._storage.bucket.get_all_keys(prefix=self._LOCATION)
             self._storage.bucket.delete_keys(all_keys, quiet=True)
         except:
             pass
