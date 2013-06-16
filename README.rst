@@ -46,16 +46,21 @@ keys of the *OPTIONS* dictionary in *settings.py* as shown above. If something
 is not defined explicitly it follows the defaults of *s3boto* backend from
 *django-storages* which in turn reads them from *settings.py*.
 
-**NB:** some values in *settings.py* may be used globally by *boto* and other AWS aware
+**NOTE-1:** some values in *settings.py* may be used globally by *boto* and other AWS aware
 Django components since they follow the format *AWS_XXXX*. It's always best to define your
 values as cache options explicitly if you don't want to run into problems.
 
-**NB:** since version 1.2 Django S3 Cache is compatible with django-storages v1.1.8 which
+**NOTE-2:** since version 1.2 Django S3 Cache is compatible with django-storages v1.1.8 which
 has changed the names of configuration variables. All new variables are expected to be lower
 case and the AWS keys variables changed names. For exact names see the S3BotoStorage class
 definition in *s3boto.py*. Django S3 Cache implements backward compatibility with its previous
 OPTIONS syntax to allow for easier upgrades. Older names are mapped to new ones and all
 options are lower cased before passing to S3BotoStorage. The example above shows the new syntax.
+
+**NOTE-3:** before version 1.3 there is a **CRITICAL BUG** in the handling of the *LOCATION*
+option. If used cache objects will be stored under the defined directory, however culling
+and clearing the cache **was not** taking this into account. cache.clear() or cache._cull()
+will **delete the entire bucket**. This has been fixed in version 1.3!
 
 Some notable options are:
 
