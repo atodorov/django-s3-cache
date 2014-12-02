@@ -31,9 +31,9 @@ Configure the use of this backend:
             'default': {
                 'BACKEND': 's3cache.AmazonS3Cache',
                 'OPTIONS': {
-                    'access_key' : 'Your AWS access key',
-                    'secret_key' : 'Your AWS secret access key',
-                    'bucket_name': 'Your AWS storage bucket name',
+                    'ACCESS_KEY' : 'Your AWS access key',
+                    'SECRET_KEY' : 'Your AWS secret access key',
+                    'BUCKET_NAME': 'Your AWS storage bucket name',
                 }
             }
         }
