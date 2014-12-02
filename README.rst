@@ -34,6 +34,7 @@ Configure the use of this backend:
                     'ACCESS_KEY' : 'Your AWS access key',
                     'SECRET_KEY' : 'Your AWS secret access key',
                     'BUCKET_NAME': 'Your AWS storage bucket name',
+                    'LOCATION'   : 'directory_prefix',
                 }
             }
         }
