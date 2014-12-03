@@ -28,12 +28,6 @@ def execute_tests():
             }
         }
 
-    global_settings.CACHES = {
-        'default': {
-            'BACKEND': 's3cache.AmazonS3Cache',
-        }
-    }
-
     from django.test.utils import get_runner
     test_runner = get_runner(global_settings)
 
