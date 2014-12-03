@@ -37,9 +37,12 @@ class AmazonS3Cache(BaseCache):
         # backward compatible syntax for s3cache users before v1.2 for easy upgrades
         # in v1.2 we update to latest django-storages 1.1.8 which changes variable names
         # in non-backward compatible fashion
-        self._options['ACCESS_KEY'] = self._options.get('ACCESS_KEY_ID', None)
-        self._options['SECRET_KEY'] = self._options.get('SECRET_ACCESS_KEY', None)
-        self._options['BUCKET_NAME'] = self._options.get('STORAGE_BUCKET_NAME', None)
+        if 'ACCESS_KEY' not in self._options.keys():
+            self._options['ACCESS_KEY'] = self._options.get('ACCESS_KEY_ID', None)
+        if 'SECRET_KEY' not in self._options.keys():
+            self._options['SECRET_KEY'] = self._options.get('SECRET_ACCESS_KEY', None)
+        if 'BUCKET_NAME' not in self._options.keys():
+            self._options['BUCKET_NAME'] = self._options.get('STORAGE_BUCKET_NAME', None)
 
         # we use S3 compatible varibale names while django-storages doesn't
         _BUCKET_NAME = self._options.get('BUCKET_NAME', None)

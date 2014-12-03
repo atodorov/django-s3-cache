@@ -63,6 +63,11 @@ option. If used cache objects will be stored under the defined directory, howeve
 and clearing the cache **was not** taking this into account. cache.clear() or cache._cull()
 will **delete the entire bucket**. This has been fixed in version 1.3!
 
+**NOTE-4:** in versions 1.2 to 1.3 there is a **BUG** in the backward compatibility handling
+of *OPTIONS*. If you have been using the new style syntax for *ACCESS_KEY*, *SECRET_KEY*,
+*BUCKET_NAME* it would be overriden and boto will crash due to missing authentication parameters.
+This has been fixed in version 1.4!
+
 Some notable options are:
 
 * *LOCATION* - the directory prefix under which to store cache files. Defaults to empty string, which means the root directory;
