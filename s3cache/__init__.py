@@ -48,17 +48,10 @@ class AmazonS3Cache(BaseCache):
         # in case it was not specified in OPTIONS default to 'private'
         self._options['BUCKET_ACL'] = _BUCKET_ACL
 
-        # sanitize location by removing leading and traling slashes
+
         self._LOCATION = self._options.get('LOCATION', self._options.get('location', ''))
-
-        while self._LOCATION.startswith('/'):
-            self._LOCATION = self._LOCATION[1:]
-
-        while self._LOCATION.endswith('/'):
-            self._LOCATION = self._LOCATION[:-1]
-
-        # overwrite value specified by user
-        self._options['LOCATION'] = self._LOCATION
+        # sanitize location by removing leading and traling slashes
+        self._options['LOCATION'] = self._LOCATION.strip('/')
 
         # S3BotoStorage wants lower case names
         for name, value in self._options.items():
