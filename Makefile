@@ -1,7 +1,10 @@
-build:
+test:
+	./setup.py test
+
+build: test
 	./setup.py sdist
 
-upload:
+upload: test
 	./setup.py sdist upload
 
 clean:
@@ -11,10 +14,12 @@ clean:
 
 distclean: clean
 	rm -rf dist/
+	rm -rf tests/__pycache__/
 
 help:
 	@echo "Usage: make <target>                   "
 	@echo "                                       "
+	@echo " test - run the tests                  "
 	@echo " build - build the package             "
 	@echo " upload - upload to PyPI               "
 	@echo " clean - remove all build files        "
