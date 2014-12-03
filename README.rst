@@ -2,7 +2,7 @@ Django S3 Cache
 ---------------
 
 .. image:: https://drone.io/github.com/atodorov/django-s3-cache/status.png
-   :target: https://drone.io/github.com/atodorov/django-s3-cache/
+   :target: https://drone.io/github.com/atodorov/django-s3-cache
    :alt: Build status
 
 .. image:: https://pypip.in/download/django-s3-cache/badge.png
