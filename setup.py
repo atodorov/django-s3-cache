@@ -1,27 +1,46 @@
 #!/usr/bin/env python
 
+import os
 import sys
 from setuptools import setup, find_packages
-from setuptools.command.test import test as TestCommand
 
 
-class PyTest(TestCommand):
-    user_options = [('pytest-args=', 'a', "Arguments to pass to py.test")]
+def execute_tests():
+    """
+    Standalone django model test with a 'memory-only-django-installation'.
+    You can play with a django model without a complete django app installation.
+    http://www.djangosnippets.org/snippets/1044/
+    """
+    import django
 
-    def initialize_options(self):
-        TestCommand.initialize_options(self)
-        self.pytest_args = []
+    sys.exc_clear()
 
-    def finalize_options(self):
-        TestCommand.finalize_options(self)
-        self.test_args = []
-        self.test_suite = True
+    os.environ["DJANGO_SETTINGS_MODULE"] = "django.conf.global_settings"
+    from django.conf import global_settings
 
-    def run_tests(self):
-        #import here, cause outside the eggs aren't loaded
-        import pytest
-        errno = pytest.main(self.pytest_args)
-        sys.exit(errno)
+    global_settings.INSTALLED_APPS = ()
+    global_settings.MIDDLEWARE_CLASSES = ()
+    global_settings.SECRET_KEY = "not-very-secret"
+
+    global_settings.DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+            }
+        }
+
+    global_settings.CACHES = {
+        'default': {
+            'BACKEND': 's3cache.AmazonS3Cache',
+        }
+    }
+
+    from django.test.utils import get_runner
+    test_runner = get_runner(global_settings)
+
+    test_runner = test_runner()
+    failures = test_runner.run_tests(['s3cache'])
+    sys.exit(failures)
+
 
 with open('README.rst') as file:
     long_description = file.read()
@@ -48,7 +67,7 @@ config = {
     ],
     'zip_safe' : False,
     'install_requires' : ['boto','django-storages>=1.1.8','Django'],
-    'cmdclass' : {'test': PyTest},
+    'test_suite' : '__main__.execute_tests',
 }
 
 if (len(sys.argv) >= 2) and (sys.argv[1] == '--requires'):
