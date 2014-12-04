@@ -45,7 +45,7 @@ with open('README.rst') as file:
 
 config = {
     'name' : 'django-s3-cache',
-    'version' : '1.4.1',
+    'version' : '1.4.2',
     'packages' : find_packages(),
     'author' : 'Alexander Todorov',
     'author_email' : 'atodorov@nospam.otb.bg',
