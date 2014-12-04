@@ -28,6 +28,10 @@ def execute_tests():
             }
         }
 
+    # http://django.readthedocs.org/en/latest/releases/1.7.html#standalone-scripts
+    if django.VERSION >= (1,7):
+        django.setup()
+
     from django.test.utils import get_runner
     test_runner = get_runner(global_settings)
 
