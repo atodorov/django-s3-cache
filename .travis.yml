@@ -3,15 +3,21 @@ after_success:
 before_install:
 - pip install coveralls
 - if [ -z "$_COMMAND" ]; then export _COMMAND=test; fi
-- if [ -z "$_DJANGO" ]; then export _DJANGO=1.10.4; fi
+- if [ -z "$_DJANGO" ]; then export _DJANGO=1.10.4; export _DJANGO_STORAGES=1.5.1; export _BOTO3=1.4.3; fi
 env:
 - !!python/unicode '_DJANGO=1.10.4 _DJANGO_STORAGES=1.5.1 _BOTO=2.45.0'
 - !!python/unicode '_DJANGO=1.8.17 _DJANGO_STORAGES=1.5.1 _BOTO=2.45.0'
 - !!python/unicode '_DJANGO=1.9.12 _DJANGO_STORAGES=1.5.1 _BOTO=2.45.0'
+
+- !!python/unicode '_DJANGO=1.10.4 _DJANGO_STORAGES=1.5.1 _BOTO3=1.4.3'
+- !!python/unicode '_DJANGO=1.8.17 _DJANGO_STORAGES=1.5.1 _BOTO3=1.4.3'
+- !!python/unicode '_DJANGO=1.9.12 _DJANGO_STORAGES=1.5.1 _BOTO3=1.4.3'
 install:
-- pip install Django==$_DJANGO boto==$_BOTO django-storages==$_DJANGO_STORAGES
-- pip install coverage django-nose
+- pip install django-nose
 - pip install https://github.com/PyCQA/astroid/zipball/master https://github.com/PyCQA/pylint/zipball/master
+- if [ -n "$_BOTO" ]; then pip install boto==$_BOTO; fi
+- if [ -n "$_BOTO3" ]; then pip install boto3==$_BOTO3; fi
+- if [ -n "$_DJANGO" ]; then pip install Django==$_DJANGO django-storages==$_DJANGO_STORAGES; fi
 language: python
 matrix:
   include:
@@ -25,4 +31,5 @@ notifications:
 python:
 - 2.7
 - 3.5
-script: make $_COMMAND
+script:
+- make $_COMMAND
