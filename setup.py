@@ -13,8 +13,6 @@ def execute_tests():
     """
     import django
 
-    sys.exc_clear()
-
     os.environ["DJANGO_SETTINGS_MODULE"] = "django.conf.global_settings"
     from django.conf import global_settings
 
@@ -48,7 +46,7 @@ config = {
     'version' : '1.4.2',
     'packages' : find_packages(),
     'author' : 'Alexander Todorov',
-    'author_email' : 'atodorov@nospam.otb.bg',
+    'author_email' : 'atodorov@MrSenko.com',
     'license' : 'BSD',
     'description' : 'Amazon Simple Storage Service (S3) cache backend for Django',
     'long_description' : long_description,
@@ -70,6 +68,6 @@ config = {
 
 if (len(sys.argv) >= 2) and (sys.argv[1] == '--requires'):
     for req in config['install_requires']:
-        print req
+        print(req)
 else:
     setup(**config)

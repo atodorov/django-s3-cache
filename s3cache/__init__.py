@@ -1,6 +1,6 @@
 "Amazon S3 cache backend for Django"
 
-# Copyright (c) 2012, Alexander Todorov <atodorov@nospam.otb.bg>
+# Copyright (c) 2012,2017 Alexander Todorov <atodorov@MrSenko.com>
 #
 # Taken directly from django.core.cache.backends.filebased.FileBasedCache
 # and adapted for S3.
@@ -57,9 +57,14 @@ class AmazonS3Cache(BaseCache):
         self._options['LOCATION'] = self._LOCATION.strip('/')
 
         # S3BotoStorage wants lower case names
+        lowercase_options = []
         for name, value in self._options.items():
             if value is not None: # skip None values
-                self._options[name.lower()] = value
+                lowercase_options.append((name.lower(), value))
+        # this avoids RuntimeError: dictionary changed size during iteration
+        # with Python 3 if we assign to the dictionary directly
+        for _n, _v in lowercase_options:
+            self._options[_n] = _v
 
         self._storage = s3boto.S3BotoStorage(
                                     acl=_DEFAULT_ACL,
