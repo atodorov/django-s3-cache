@@ -182,7 +182,7 @@ class AmazonS3Cache(BaseCache):
 
         try:
             keylist = self._storage.bucket.get_all_keys(prefix=self._location)
-        except:
+        except (IOError, OSError):
             return
 
         if self._cull_frequency == 0:
@@ -192,7 +192,7 @@ class AmazonS3Cache(BaseCache):
 
         try:
             self._storage.bucket.delete_keys(doomed, quiet=True)
-        except:
+        except (IOError, OSError):
             pass
 
 
@@ -207,7 +207,7 @@ class AmazonS3Cache(BaseCache):
         try:
             all_keys = self._storage.bucket.get_all_keys(prefix=self._location)
             self._storage.bucket.delete_keys(all_keys, quiet=True)
-        except:
+        except (IOError, OSError):
             pass
 
 # For backwards compatibility
