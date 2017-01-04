@@ -1,3 +1,4 @@
+sudo: false
 after_success:
 - coveralls
 before_install:
