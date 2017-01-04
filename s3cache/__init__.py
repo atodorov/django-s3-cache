@@ -17,8 +17,26 @@ from storages.backends import s3boto
 from django.core.files.base import ContentFile
 from django.core.cache.backends.base import BaseCache
 
+def _key_to_file(key):
+    """
+        All files go into a single flat directory because it's not easier
+        to search/delete empty directories in _delete().
+
+        Plus Amazon S3 doesn't seem to have a problem with many files into one directory.
+
+        NB: measuring sha1() with timeit shows it is a bit faster compared to md5()
+        http://stackoverflow.com/questions/2241013/is-there-a-significant-overhead-by-using-different-versions-of-sha-hashing-hash
+
+        UPDATE: this is wrong, md5() is still faster, see:
+        http://atodorov.org/blog/2013/02/05/performance-test-md5-sha1-sha256-sha512/
+    """
+    return hashlib.sha1(key).hexdigest()
+
 class AmazonS3Cache(BaseCache):
-    def __init__(self, location, params):
+    """
+        Amazon S3 cache backend for Django
+    """
+    def __init__(self, _location, params):
         """
             location is not used but otherwise Django crashes.
         """
@@ -27,7 +45,8 @@ class AmazonS3Cache(BaseCache):
 
         # Amazon and boto has a maximum limit of 1000 for get_all_keys(). See:
         # http://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGET.html
-        # This implementation of the GET operation returns some or all (up to 1000) of the objects in a bucket....
+        # This implementation of the GET operation returns some or all (up to 1000)
+        # of the objects in a bucket....
 
         if self._max_entries > 1000:
             self._max_entries = 1000
@@ -45,16 +64,16 @@ class AmazonS3Cache(BaseCache):
             self._options['BUCKET_NAME'] = self._options.get('STORAGE_BUCKET_NAME', None)
 
         # we use S3 compatible varibale names while django-storages doesn't
-        _BUCKET_NAME = self._options.get('BUCKET_NAME', None)
-        _DEFAULT_ACL = self._options.get('DEFAULT_ACL', 'private')
-        _BUCKET_ACL  = self._options.get('BUCKET_ACL', _DEFAULT_ACL)
+        _bucket_name = self._options.get('BUCKET_NAME', None)
+        _default_acl = self._options.get('DEFAULT_ACL', 'private')
+        _bucket_acl = self._options.get('BUCKET_ACL', _default_acl)
         # in case it was not specified in OPTIONS default to 'private'
-        self._options['BUCKET_ACL'] = _BUCKET_ACL
+        self._options['BUCKET_ACL'] = _bucket_acl
 
 
-        self._LOCATION = self._options.get('LOCATION', self._options.get('location', ''))
+        self._location = self._options.get('LOCATION', self._options.get('location', ''))
         # sanitize location by removing leading and traling slashes
-        self._options['LOCATION'] = self._LOCATION.strip('/')
+        self._options['LOCATION'] = self._location.strip('/')
 
         # S3BotoStorage wants lower case names
         lowercase_options = []
@@ -67,10 +86,10 @@ class AmazonS3Cache(BaseCache):
             self._options[_n] = _v
 
         self._storage = s3boto.S3BotoStorage(
-                                    acl=_DEFAULT_ACL,
-                                    bucket=_BUCKET_NAME,
-                                    **self._options
-                                )
+            acl=_default_acl,
+            bucket=_bucket_name,
+            **self._options
+        )
 
 
     def add(self, key, value, timeout=None, version=None):
@@ -84,18 +103,18 @@ class AmazonS3Cache(BaseCache):
         key = self.make_key(key, version=version)
         self.validate_key(key)
 
-        fname = self._key_to_file(key)
+        fname = _key_to_file(key)
         try:
-            f = self._storage.open(fname, 'rb')
+            fobj = self._storage.open(fname, 'rb')
             try:
-                exp = pickle.load(f)
+                exp = pickle.load(fobj)
                 now = time.time()
                 if exp < now:
                     self._delete(fname)
                 else:
-                    return pickle.load(f)
+                    return pickle.load(fobj)
             finally:
-                f.close()
+                fobj.close()
         except (IOError, OSError, EOFError, pickle.PickleError):
             pass
         return default
@@ -104,7 +123,7 @@ class AmazonS3Cache(BaseCache):
         key = self.make_key(key, version=version)
         self.validate_key(key)
 
-        fname = self._key_to_file(key)
+        fname = _key_to_file(key)
 
         if timeout is None:
             timeout = self.default_timeout
@@ -123,7 +142,7 @@ class AmazonS3Cache(BaseCache):
         key = self.make_key(key, version=version)
         self.validate_key(key)
         try:
-            self._delete(self._key_to_file(key))
+            self._delete(_key_to_file(key))
         except (IOError, OSError):
             pass
 
@@ -133,11 +152,11 @@ class AmazonS3Cache(BaseCache):
     def has_key(self, key, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
-        fname = self._key_to_file(key)
+        fname = _key_to_file(key)
         try:
-            f = self._storage.open(fname, 'rb')
+            fobj = self._storage.open(fname, 'rb')
             try:
-                exp = pickle.load(f)
+                exp = pickle.load(fobj)
                 now = time.time()
                 if exp < now:
                     self._delete(fname)
@@ -145,7 +164,7 @@ class AmazonS3Cache(BaseCache):
                 else:
                     return True
             finally:
-                f.close()
+                fobj.close()
         except (IOError, OSError, EOFError, pickle.PickleError):
             return False
 
@@ -157,7 +176,7 @@ class AmazonS3Cache(BaseCache):
             return
 
         try:
-            keylist = self._storage.bucket.get_all_keys(prefix=self._LOCATION)
+            keylist = self._storage.bucket.get_all_keys(prefix=self._location)
         except:
             return
 
@@ -171,35 +190,24 @@ class AmazonS3Cache(BaseCache):
         except:
             pass
 
-    def _key_to_file(self, key):
-        """
-            All files go into a single flat directory because it's not easier
-            to search/delete empty directories in _delete().
-
-            Plus Amazon S3 doesn't seem to have a problem with many files into one directory.
-
-            NB: measuring sha1() with timeit shows it is a bit faster compared to md5()
-            http://stackoverflow.com/questions/2241013/is-there-a-significant-overhead-by-using-different-versions-of-sha-hashing-hash
-
-            UPDATE: this is wrong, md5() is still faster, see:
-            http://atodorov.org/blog/2013/02/05/performance-test-md5-sha1-sha256-sha512/
-        """
-        return hashlib.sha1(key).hexdigest()
 
     def _get_num_entries(self):
         """
             There seems to be an artificial limit of 1000
         """
-        return len(self._storage.bucket.get_all_keys(prefix=self._LOCATION))
+        return len(self._storage.bucket.get_all_keys(prefix=self._location))
     _num_entries = property(_get_num_entries)
 
     def clear(self):
         try:
-            all_keys = self._storage.bucket.get_all_keys(prefix=self._LOCATION)
+            all_keys = self._storage.bucket.get_all_keys(prefix=self._location)
             self._storage.bucket.delete_keys(all_keys, quiet=True)
         except:
             pass
 
 # For backwards compatibility
 class CacheClass(AmazonS3Cache):
+    """
+        Backward compatibility class definition
+    """
     pass

@@ -1,3 +1,5 @@
+# pylint: disable=missing-docstring,protected-access
+
 from s3cache import AmazonS3Cache
 from django.test import TestCase
 
@@ -11,16 +13,16 @@ class CacheConfigurationTest(S3CacheTestCase):
             needs to be translated to latest syntax
         """
         cache = AmazonS3Cache(
-                    None, # location
-                    {
-                        'BACKEND': 's3cache.AmazonS3Cache',
-                        'OPTIONS' : {
-                            'ACCESS_KEY_ID' : 'access_key_old',
-                            'SECRET_ACCESS_KEY' : 'secret_key_old',
-                            'STORAGE_BUCKET_NAME': 'bucket_old',
-                        }
-                    }
-                )
+            None, # location
+            {
+                'BACKEND': 's3cache.AmazonS3Cache',
+                'OPTIONS' : {
+                    'ACCESS_KEY_ID' : 'access_key_old',
+                    'SECRET_ACCESS_KEY' : 'secret_key_old',
+                    'STORAGE_BUCKET_NAME': 'bucket_old',
+                }
+            }
+        )
 
         self.assertEqual(cache._options['access_key'], 'access_key_old')
         self.assertEqual(cache._options['secret_key'], 'secret_key_old')
@@ -31,16 +33,16 @@ class CacheConfigurationTest(S3CacheTestCase):
             Test django-storages >= 1.1.8 options syntax
         """
         cache = AmazonS3Cache(
-                    None, # location
-                    {
-                        'BACKEND': 's3cache.AmazonS3Cache',
-                        'OPTIONS' : {
-                            'ACCESS_KEY' : 'access_key_new',
-                            'SECRET_KEY' : 'secret_key_new',
-                            'BUCKET_NAME': 'bucket_new',
-                        }
-                    }
-                )
+            None, # location
+            {
+                'BACKEND': 's3cache.AmazonS3Cache',
+                'OPTIONS' : {
+                    'ACCESS_KEY' : 'access_key_new',
+                    'SECRET_KEY' : 'secret_key_new',
+                    'BUCKET_NAME': 'bucket_new',
+                }
+            }
+        )
 
         self.assertEqual(cache._options['access_key'], 'access_key_new')
         self.assertEqual(cache._options['secret_key'], 'secret_key_new')
@@ -51,21 +53,22 @@ class CacheConfigurationTest(S3CacheTestCase):
             Test MIXED options syntax (upgrade leftovers)
         """
         cache = AmazonS3Cache(
-                    None, # location
-                    {
-                        'BACKEND': 's3cache.AmazonS3Cache',
-                        'OPTIONS' : {
-                            'ACCESS_KEY_ID' : 'access_key_mix', # old
-                            'SECRET_KEY' : 'secret_key_mix',
-                            'STORAGE_BUCKET_NAME': 'bucket_mix', # old
-                        }
-                    }
-                )
+            None, # location
+            {
+                'BACKEND': 's3cache.AmazonS3Cache',
+                'OPTIONS' : {
+                    'ACCESS_KEY_ID' : 'access_key_mix', # old
+                    'SECRET_KEY' : 'secret_key_mix',
+                    'STORAGE_BUCKET_NAME': 'bucket_mix', # old
+                }
+            }
+        )
 
         self.assertEqual(cache._options['access_key'], 'access_key_mix')
         self.assertEqual(cache._options['secret_key'], 'secret_key_mix')
         self.assertEqual(cache._options['bucket_name'], 'bucket_mix')
 
+    # pylint: disable=invalid-name
     def test_lowercase_new_style_options(self):
         """
             Test django-storages >= 1.1.8 options syntax in lower case.
@@ -81,16 +84,16 @@ class CacheConfigurationTest(S3CacheTestCase):
             https://github.com/atodorov/django-s3-cache/issues/2#issuecomment-65423398
         """
         cache = AmazonS3Cache(
-                    None, # location
-                    {
-                        'BACKEND': 's3cache.AmazonS3Cache',
-                        'OPTIONS' : {
-                            'access_key' : 'access_key_low',
-                            'secret_key' : 'secret_key_low',
-                            'bucket_name': 'bucket_low',
-                        }
-                    }
-                )
+            None, # location
+            {
+                'BACKEND': 's3cache.AmazonS3Cache',
+                'OPTIONS' : {
+                    'access_key' : 'access_key_low',
+                    'secret_key' : 'secret_key_low',
+                    'bucket_name': 'bucket_low',
+                }
+            }
+        )
 
         self.assertEqual(cache._options['access_key'], 'access_key_low')
         self.assertEqual(cache._options['secret_key'], 'secret_key_low')
