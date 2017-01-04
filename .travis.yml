@@ -2,7 +2,7 @@ sudo: false
 after_success:
 - coveralls
 before_install:
-- pip install coveralls
+- pip install coveralls mock
 - if [ -z "$_COMMAND" ]; then export _COMMAND=test; fi
 - if [ -z "$_DJANGO" ]; then export _DJANGO=1.10.4; export _DJANGO_STORAGES=1.5.1; export _BOTO3=1.4.3; fi
 env:

@@ -30,7 +30,7 @@ def _key_to_file(key):
         UPDATE: this is wrong, md5() is still faster, see:
         http://atodorov.org/blog/2013/02/05/performance-test-md5-sha1-sha256-sha512/
     """
-    return hashlib.sha1(key).hexdigest()
+    return hashlib.sha1(key.encode('utf-8')).hexdigest()
 
 class AmazonS3Cache(BaseCache):
     """
@@ -107,11 +107,7 @@ class AmazonS3Cache(BaseCache):
         try:
             fobj = self._storage.open(fname, 'rb')
             try:
-                exp = pickle.load(fobj)
-                now = time.time()
-                if exp < now:
-                    self._delete(fname)
-                else:
+                if not self._is_expired(fobj, fname):
                     return pickle.load(fobj)
             finally:
                 fobj.close()
@@ -125,18 +121,21 @@ class AmazonS3Cache(BaseCache):
 
         fname = _key_to_file(key)
 
-        if timeout is None:
-            timeout = self.default_timeout
-
         self._cull()
 
         try:
-            now = time.time()
-            content = pickle.dumps(now + timeout, pickle.HIGHEST_PROTOCOL)
-            content += pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
+            content = self._dump_object(value, timeout)
             self._storage.save(fname, ContentFile(content))
         except (IOError, OSError, EOFError, pickle.PickleError):
             pass
+
+    def _dump_object(self, value, timeout=None):
+        if timeout is None:
+            timeout = self.default_timeout
+
+        content = pickle.dumps(time.time() + timeout, pickle.HIGHEST_PROTOCOL)
+        content += pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
+        return content
 
     def delete(self, key, version=None):
         key = self.make_key(key, version=version)
@@ -156,17 +155,23 @@ class AmazonS3Cache(BaseCache):
         try:
             fobj = self._storage.open(fname, 'rb')
             try:
-                exp = pickle.load(fobj)
-                now = time.time()
-                if exp < now:
-                    self._delete(fname)
-                    return False
-                else:
-                    return True
+                return not self._is_expired(fobj, fname)
             finally:
                 fobj.close()
         except (IOError, OSError, EOFError, pickle.PickleError):
             return False
+
+    def _is_expired(self, fobj, fname):
+        """
+            Takes an open cache file and determines if it has expired,
+            deletes the file if it is has passed its expiry time.
+        """
+        exp = pickle.load(fobj)
+        if exp < time.time():
+            self._delete(fname)
+            return True
+
+        return False
 
     def _cull(self):
 
