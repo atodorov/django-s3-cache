@@ -1,5 +1,8 @@
 test:
-	./setup.py test
+	./setup.py test && coverage report -m
+
+pylint:
+	pylint -rn s3cache/ tests/*.py
 
 build: test
 	./setup.py sdist
@@ -20,6 +23,7 @@ help:
 	@echo "Usage: make <target>                   "
 	@echo "                                       "
 	@echo " test - run the tests                  "
+	@echo " pylint - run PyLint                   "
 	@echo " build - build the package             "
 	@echo " upload - upload to PyPI               "
 	@echo " clean - remove all build files        "

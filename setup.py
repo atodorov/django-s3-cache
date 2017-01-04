@@ -16,7 +16,14 @@ def execute_tests():
     os.environ["DJANGO_SETTINGS_MODULE"] = "django.conf.global_settings"
     from django.conf import global_settings
 
-    global_settings.INSTALLED_APPS = ()
+    global_settings.INSTALLED_APPS = ('django_nose',)
+    global_settings.TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+    global_settings.NOSE_ARGS = [
+        '--with-coverage',
+        '--cover-erase',
+        '--cover-branches',
+        '--cover-package=s3cache',
+    ]
     global_settings.MIDDLEWARE_CLASSES = ()
     global_settings.SECRET_KEY = "not-very-secret"
 
@@ -34,7 +41,7 @@ def execute_tests():
     test_runner = get_runner(global_settings)
 
     test_runner = test_runner()
-    failures = test_runner.run_tests(['s3cache'])
+    failures = test_runner.run_tests(['tests'])
     sys.exit(failures)
 
 
