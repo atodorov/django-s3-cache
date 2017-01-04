@@ -1,21 +1,14 @@
 Django S3 Cache
 ---------------
 
-.. image:: https://drone.io/github.com/atodorov/django-s3-cache/status.png
-   :target: https://drone.io/github.com/atodorov/django-s3-cache
+.. image:: https://travis-ci.org/atodorov/django-s3-cache.svg?branch=master
+   :target: https://travis-ci.org/atodorov/django-s3-cache
    :alt: Build status
 
-.. image:: https://pypip.in/download/django-s3-cache/badge.png
-    :target: https://pypi.python.org/pypi/django-s3-cache/
-    :alt: Downloads
+.. image:: https://coveralls.io/repos/github/atodorov/django-s3-cache/badge.svg?branch=master
+   :target: https://coveralls.io/github/atodorov/django-s3-cache?branch=master
+   :alt: Code coverage
 
-.. image:: https://pypip.in/version/django-s3-cache/badge.png
-    :target: https://pypi.python.org/pypi/django-s3-cache/
-    :alt: Latest Version
-
-.. image:: https://pypip.in/license/django-s3-cache/badge.png
-    :target: https://pypi.python.org/pypi/django-s3-cache/
-    :alt: License
 
 This is Amazon Simple Storage Service (S3) cache backend for Django.
 It is based on the *django.core.cache.backends.filebased.FileBasedCache* backend
@@ -51,6 +44,13 @@ Configure the use of this backend:
                 }
             }
         }
+
+Changelog
+=========
+
+* master
+  ** Switched to Travis-CI
+  ** Started testing with pylint and boto3
 
 Configuration
 =============
