@@ -49,8 +49,9 @@ Changelog
 =========
 
 * master
-  ** Switched to Travis-CI
-  ** Started testing with pylint and boto3
+
+  * Switched to Travis-CI
+  * Started testing with pylint and boto3
 
 Configuration
 =============
