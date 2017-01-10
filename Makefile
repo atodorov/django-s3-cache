@@ -1,8 +1,9 @@
 test:
-	./setup.py test && coverage report -m
+	PYTHONPATH=. nosetests -v --with-coverage --cover-branches --cover-erase \
+	    --cover-package s3cache tests/ && coverage report -m
 
 pylint:
-	pylint -rn s3cache/ tests/*.py
+	pylint -rn *.py s3cache/ tests/*.py
 
 build: test
 	./setup.py sdist

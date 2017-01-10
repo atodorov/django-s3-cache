@@ -1,49 +1,8 @@
 #!/usr/bin/env python
+# pylint: disable=missing-docstring,invalid-name
 
-import os
 import sys
 from setuptools import setup, find_packages
-
-
-def execute_tests():
-    """
-    Standalone django model test with a 'memory-only-django-installation'.
-    You can play with a django model without a complete django app installation.
-    http://www.djangosnippets.org/snippets/1044/
-    """
-    import django
-
-    os.environ["DJANGO_SETTINGS_MODULE"] = "django.conf.global_settings"
-    from django.conf import global_settings
-
-    global_settings.INSTALLED_APPS = ('django_nose',)
-    global_settings.TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
-    global_settings.NOSE_ARGS = [
-        '--with-coverage',
-        '--cover-erase',
-        '--cover-branches',
-        '--cover-package=s3cache',
-    ]
-    global_settings.MIDDLEWARE_CLASSES = ()
-    global_settings.SECRET_KEY = "not-very-secret"
-
-    global_settings.DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.sqlite3',
-            }
-        }
-
-    # http://django.readthedocs.org/en/latest/releases/1.7.html#standalone-scripts
-    if django.VERSION >= (1,7):
-        django.setup()
-
-    from django.test.utils import get_runner
-    test_runner = get_runner(global_settings)
-
-    test_runner = test_runner()
-    failures = test_runner.run_tests(['tests'])
-    sys.exit(failures)
-
 
 with open('README.rst') as file:
     long_description = file.read()
@@ -69,8 +28,7 @@ config = {
         'Framework :: Django',
     ],
     'zip_safe' : False,
-    'install_requires' : ['boto','django-storages>=1.1.8','Django'],
-    'test_suite' : '__main__.execute_tests',
+    'install_requires' : ['boto', 'django-storages>=1.1.8', 'Django'],
 }
 
 if (len(sys.argv) >= 2) and (sys.argv[1] == '--requires'):
