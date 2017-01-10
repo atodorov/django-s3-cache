@@ -2,6 +2,12 @@ test:
 	PYTHONPATH=. nosetests -v --with-coverage --cover-branches --cover-erase \
 	    --cover-package s3cache tests/ && coverage report -m
 
+mutation_test:
+	PYTHONPATH=. cosmic-ray run --baseline=10 --test-runner=nose s3cache.json s3cache -- -v tests/*.py
+	cosmic-ray report s3cache.json
+	# allow 10% mutation test failures before reporting FAIL
+	echo "$(cosmic-ray survival-rate s3cache.json) > 10" | bc -l
+
 pylint:
 	pylint -rn *.py s3cache/ tests/*.py
 
