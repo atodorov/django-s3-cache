@@ -43,7 +43,7 @@ class AmazonS3Cache(BaseCache):
 
         BaseCache.__init__(self, params)
 
-        # Amazon and boto has a maximum limit of 1000 for get_all_keys(). See:
+        # Amazon and boto have a maximum limit of 1000 for get_all_keys(). See:
         # http://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGET.html
         # This implementation of the GET operation returns some or all (up to 1000)
         # of the objects in a bucket....
@@ -78,7 +78,7 @@ class AmazonS3Cache(BaseCache):
         # S3BotoStorage wants lower case names
         lowercase_options = []
         for name, value in self._options.items():
-            if value is not None: # skip None values
+            if value: # skip None values
                 lowercase_options.append((name.lower(), value))
         # this avoids RuntimeError: dictionary changed size during iteration
         # with Python 3 if we assign to the dictionary directly
@@ -173,7 +173,9 @@ class AmazonS3Cache(BaseCache):
 
         return False
 
-    def _cull(self):
+    def _cull(self, frequency=None):
+        if frequency is None:
+            frequency = self._cull_frequency
 
         if not self._max_entries:
             return
@@ -185,10 +187,10 @@ class AmazonS3Cache(BaseCache):
         except (IOError, OSError):
             return
 
-        if self._cull_frequency == 0:
+        if not frequency:
             doomed = keylist
         else:
-            doomed = [k for (i, k) in enumerate(keylist) if i % self._cull_frequency == 0]
+            doomed = [k for (i, k) in enumerate(keylist) if i % frequency == 0]
 
         try:
             self._storage.bucket.delete_keys(doomed, quiet=True)
@@ -204,11 +206,8 @@ class AmazonS3Cache(BaseCache):
     _num_entries = property(_get_num_entries)
 
     def clear(self):
-        try:
-            all_keys = self._storage.bucket.get_all_keys(prefix=self._location)
-            self._storage.bucket.delete_keys(all_keys, quiet=True)
-        except (IOError, OSError):
-            pass
+        # delete all keys
+        self._cull(0)
 
 # For backwards compatibility
 class CacheClass(AmazonS3Cache):

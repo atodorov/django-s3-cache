@@ -5,6 +5,7 @@ try:
     from unittest.mock import patch
 except ImportError:
     from mock import patch
+import time
 from s3cache import AmazonS3Cache
 from django.test import TestCase
 
@@ -125,7 +126,7 @@ class FunctionalTests(TestCase):
             self.assertFalse(self.cache._is_expired(obj, 'dummy file name'))
 
     def test_max_entries_great_than_1000(self):
-        cache = AmazonS3Cache(None, {'OPTIONS': {'MAX_ENTRIES': 2000}})
+        cache = AmazonS3Cache(None, {'OPTIONS': {'MAX_ENTRIES': 1001}})
         self.assertEqual(cache._max_entries, 1000)
 
     def test_max_entries_less_than_1000(self):
@@ -176,6 +177,17 @@ class FunctionalTests(TestCase):
              patch.object(AmazonS3Cache, '_delete'):
             self.assertEqual(self.cache.get('my-key'), None)
 
+    def test_get_after_waiting_the_object_to_expire(self):
+        obj = self._dump_object('TEST', 2)
+        # wait for object expiration
+        # when mutation testing is used
+        # time.time() * timeout instead of time.time() + timeout mutation
+        # will set the expiration date in the future
+        time.sleep(3)
+        with patch.object(self.cache._storage, 'open', return_value=obj), \
+             patch.object(AmazonS3Cache, '_delete'):
+            self.assertEqual(self.cache.get('my-key'), None)
+
     def test_get_storage_raises_exception(self):
         with patch.object(self.cache._storage, 'open', side_effect=IOError):
             self.assertEqual(self.cache.get('my-key'), None)
@@ -191,8 +203,20 @@ class FunctionalTests(TestCase):
             self.cache.delete('my-key')
 
     def test_clear(self):
-        with patch.object(self.cache._storage, '_bucket'):
-            self.cache.clear()
+        cache = AmazonS3Cache(None, {})
+        cache._max_entries = 10
+        cache._cull_frequency = 3
+        key_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
+        with patch.object(cache._storage, '_bucket') as _bucket:
+            _bucket.configure_mock(**{
+                'get_all_keys.return_value': key_list
+            })
+            cache.clear()
+            self.assertEqual(_bucket.get_all_keys.call_count, 2)
+            self.assertEqual(_bucket.delete_keys.call_count, 1)
+            # all keys were deleted
+            _bucket.delete_keys.assert_called_with(key_list, quiet=True)
+
 
     def test_clear_bucket_raises_exception(self):
         with patch.object(self.cache._storage, '_bucket') as _bucket:
@@ -244,8 +268,8 @@ class FunctionalTests(TestCase):
         cache = AmazonS3Cache(None, {})
         cache._max_entries = 5
         cache._cull_frequency = 3
-        key_list = [1, 2, 3, 5, 6, 7, 8, 9, 0]
-        delete_list = [1, 5, 8]
+        key_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
+        delete_list = [1, 4, 7, 0]
         with patch.object(cache._storage, '_bucket') as _bucket:
             _bucket.configure_mock(**{
                 'get_all_keys.return_value': key_list
