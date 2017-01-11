@@ -10,9 +10,6 @@ env:
 - !!python/unicode '_DJANGO=1.8.17 _DJANGO_STORAGES=1.5.1 _BOTO=2.45.0'
 - !!python/unicode '_DJANGO=1.9.12 _DJANGO_STORAGES=1.5.1 _BOTO=2.45.0'
 
-- !!python/unicode '_DJANGO=1.10.4 _DJANGO_STORAGES=1.5.1 _BOTO3=1.4.3'
-- !!python/unicode '_DJANGO=1.8.17 _DJANGO_STORAGES=1.5.1 _BOTO3=1.4.3'
-- !!python/unicode '_DJANGO=1.9.12 _DJANGO_STORAGES=1.5.1 _BOTO3=1.4.3'
 install:
 - pip install django-nose
 - pip install https://github.com/PyCQA/astroid/zipball/master https://github.com/PyCQA/pylint/zipball/master

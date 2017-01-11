@@ -51,7 +51,8 @@ Changelog
 * master
 
   * Switched to Travis-CI
-  * Started testing with pylint and boto3
+  * Started testing with pylint
+  * Internal code refactoring and more testing
 
 Configuration
 =============
