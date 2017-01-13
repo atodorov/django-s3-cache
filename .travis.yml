@@ -1,22 +1,26 @@
-sudo: false
 after_success:
 - coveralls
 before_install:
 - pip install coveralls mock
 - if [ -z "$_COMMAND" ]; then export _COMMAND=test; fi
-- if [ -z "$_DJANGO" ]; then export _DJANGO=1.10.4; export _DJANGO_STORAGES=1.5.1; export _BOTO=2.45.0; fi
+- if [ -z "$_DJANGO" ]; then export _DJANGO=1.10.4; export _DJANGO_STORAGES=1.5.1;
+  export _BOTO=2.45.0; fi
 env:
-- !!python/unicode '_DJANGO=1.10.4 _DJANGO_STORAGES=1.5.1 _BOTO=2.45.0'
-- !!python/unicode '_DJANGO=1.8.17 _DJANGO_STORAGES=1.5.1 _BOTO=2.45.0'
-- !!python/unicode '_DJANGO=1.9.12 _DJANGO_STORAGES=1.5.1 _BOTO=2.45.0'
-
+- !!python/unicode '_BOTO=2.45.0 _DJANGO=1.10.4 _DJANGO_STORAGES=1.5.1'
+- !!python/unicode '_BOTO=2.45.0 _DJANGO=1.10.4 _DJANGO_STORAGES=1.5.2'
+- !!python/unicode '_BOTO=2.45.0 _DJANGO=1.8.17 _DJANGO_STORAGES=1.5.1'
+- !!python/unicode '_BOTO=2.45.0 _DJANGO=1.8.17 _DJANGO_STORAGES=1.5.2'
+- !!python/unicode '_BOTO=2.45.0 _DJANGO=1.9.12 _DJANGO_STORAGES=1.5.1'
+- !!python/unicode '_BOTO=2.45.0 _DJANGO=1.9.12 _DJANGO_STORAGES=1.5.2'
 install:
 - pip install django-nose
 - pip install https://github.com/PyCQA/astroid/zipball/master https://github.com/PyCQA/pylint/zipball/master
-- if [ "$_COMMAND" == "mutation_test" ]; then pip install https://github.com/sixty-north/cosmic-ray/zipball/master; fi
+- if [ "$_COMMAND" == "mutation_test" ]; then pip install https://github.com/sixty-north/cosmic-ray/zipball/master;
+  fi
 - if [ -n "$_BOTO" ]; then pip install boto==$_BOTO; fi
 - if [ -n "$_BOTO3" ]; then pip install boto3==$_BOTO3; fi
-- if [ -n "$_DJANGO" ]; then pip install Django==$_DJANGO django-storages==$_DJANGO_STORAGES; fi
+- if [ -n "$_DJANGO" ]; then pip install Django==$_DJANGO django-storages==$_DJANGO_STORAGES;
+  fi
 language: python
 matrix:
   include:
@@ -24,7 +28,6 @@ matrix:
     python: 3.5
   - env: _COMMAND=mutation_test
     python: 3.5
-
 notifications:
   email:
     on_failure: change
@@ -34,3 +37,4 @@ python:
 - 3.5
 script:
 - make $_COMMAND
+sudo: false
