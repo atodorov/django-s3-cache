@@ -26,6 +26,16 @@ env:
 - !!python/unicode '_BOTO=2.46.0 _DJANGO=1.8.17 _DJANGO_STORAGES=1.5.2'
 - !!python/unicode '_BOTO=2.46.0 _DJANGO=1.9.12 _DJANGO_STORAGES=1.5.1'
 - !!python/unicode '_BOTO=2.46.0 _DJANGO=1.9.12 _DJANGO_STORAGES=1.5.2'
+- !!python/unicode '_BOTO=2.46.1 _DJANGO=1.10.4 _DJANGO_STORAGES=1.5.1'
+- !!python/unicode '_BOTO=2.46.1 _DJANGO=1.10.4 _DJANGO_STORAGES=1.5.2'
+- !!python/unicode '_BOTO=2.46.1 _DJANGO=1.11a1 _DJANGO_STORAGES=1.5.1'
+- !!python/unicode '_BOTO=2.46.1 _DJANGO=1.11a1 _DJANGO_STORAGES=1.5.2'
+- !!python/unicode '_BOTO=2.46.1 _DJANGO=1.11b1 _DJANGO_STORAGES=1.5.1'
+- !!python/unicode '_BOTO=2.46.1 _DJANGO=1.11b1 _DJANGO_STORAGES=1.5.2'
+- !!python/unicode '_BOTO=2.46.1 _DJANGO=1.8.17 _DJANGO_STORAGES=1.5.1'
+- !!python/unicode '_BOTO=2.46.1 _DJANGO=1.8.17 _DJANGO_STORAGES=1.5.2'
+- !!python/unicode '_BOTO=2.46.1 _DJANGO=1.9.12 _DJANGO_STORAGES=1.5.1'
+- !!python/unicode '_BOTO=2.46.1 _DJANGO=1.9.12 _DJANGO_STORAGES=1.5.2'
 install:
 - pip install django-nose
 - pip install https://github.com/PyCQA/astroid/zipball/master https://github.com/PyCQA/pylint/zipball/master
