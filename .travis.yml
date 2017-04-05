@@ -1,3 +1,7 @@
+addons:
+  apt:
+    packages:
+    - bc
 after_success:
 - coveralls
 before_install:
