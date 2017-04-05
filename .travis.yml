@@ -7,7 +7,7 @@ after_success:
 before_install:
 - pip install coveralls mock
 - if [ -z "$_COMMAND" ]; then export _COMMAND=test; fi
-- if [ -z "$_DJANGO" ]; then export _DJANGO=1.10.6; export _DJANGO_STORAGES=1.5.1;
+- if [ -z "$_DJANGO" ]; then export _DJANGO=1.11; export _DJANGO_STORAGES=1.5.2;
   export _BOTO=2.46.1; fi
 env:
 - !!python/unicode '_BOTO=2.45.0 _DJANGO=1.10.4 _DJANGO_STORAGES=1.5.1'
