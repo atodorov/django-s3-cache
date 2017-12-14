@@ -9,6 +9,10 @@ Django S3 Cache
    :target: https://coveralls.io/github/atodorov/django-s3-cache?branch=master
    :alt: Code coverage
 
+.. image:: https://api.codeclimate.com/v1/badges/634faffb0ab0a5c81355/maintainability
+   :target: https://codeclimate.com/github/atodorov/django-s3-cache/maintainability
+   :alt: Maintainability
+
 
 This is Amazon Simple Storage Service (S3) cache backend for Django.
 It is based on the *django.core.cache.backends.filebased.FileBasedCache* backend
