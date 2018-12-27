@@ -23,6 +23,10 @@ data into S3. It uses the *s3boto* storage backend.
 All key/values passed to this backend are stored in a flat directory structure
 in your S3 bucket. It uses sha1 instead of md5 to create the file name.
 
+
+**This project is looking for maintainers!**
+
+
 Installation
 ============
 
