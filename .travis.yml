@@ -14,11 +14,10 @@ env:
 - _BOTO=2.49.0 _DJANGO=2.1.4 _DJANGO_STORAGES=1.7.1
 install:
 - pip install django-nose
-- pip install https://github.com/PyCQA/astroid/zipball/master https://github.com/PyCQA/pylint/zipball/master
+- pip install pylint
 - if [ -n "$_BOTO" ]; then pip install boto==$_BOTO; fi
 - if [ -n "$_BOTO3" ]; then pip install boto3==$_BOTO3; fi
-- if [ -n "$_DJANGO" ]; then pip install Django==$_DJANGO django-storages==$_DJANGO_STORAGES;
-  fi
+- if [ -n "$_DJANGO" ]; then pip install Django==$_DJANGO django-storages==$_DJANGO_STORAGES; fi
 language: python
 matrix:
   include:
