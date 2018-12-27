@@ -179,7 +179,8 @@ class AmazonS3Cache(BaseCache):
 
         if not self._max_entries:
             return
-        elif int(self._num_entries) < self._max_entries:
+
+        if int(self._num_entries) < self._max_entries:
             return
 
         try:
@@ -214,4 +215,3 @@ class CacheClass(AmazonS3Cache):
     """
         Backward compatibility class definition
     """
-    pass

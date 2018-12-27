@@ -6,8 +6,9 @@ try:
 except ImportError:
     from mock import patch
 import time
-from s3cache import AmazonS3Cache
 from django.test import TestCase
+
+from s3cache import AmazonS3Cache
 
 class S3CacheTestCase(TestCase):
     pass
