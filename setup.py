@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # pylint: disable=missing-docstring,invalid-name
 
+from __future__ import print_function
+
 import sys
 from setuptools import setup, find_packages
 
