@@ -22,14 +22,14 @@ language: python
 matrix:
   include:
   - env: _COMMAND=pylint
-    python: 3.5
+    python: 3.6
 notifications:
   email:
     on_failure: change
     on_success: change
 python:
 - 2.7
-- 3.5
+- 3.6
 script:
 - make $_COMMAND
 sudo: false
