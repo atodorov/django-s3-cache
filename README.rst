@@ -56,8 +56,9 @@ Configure the use of this backend:
 Changelog
 =========
 
-* master
+* 1.4.3 (10 Nov 2019)
 
+  * switch license from BSD-3-Clause to MIT
   * Switched to Travis-CI
   * Started testing with pylint
   * Internal code refactoring and more testing

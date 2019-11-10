@@ -11,11 +11,11 @@ with open('README.rst') as file:
 
 config = {
     'name' : 'django-s3-cache',
-    'version' : '1.4.2',
+    'version' : '1.4.3',
     'packages' : find_packages(),
     'author' : 'Alexander Todorov',
     'author_email' : 'atodorov@MrSenko.com',
-    'license' : 'BSD',
+    'license' : 'MIT',
     'description' : 'Amazon Simple Storage Service (S3) cache backend for Django',
     'long_description' : long_description,
     'url' : 'https://github.com/atodorov/django-s3-cache',
@@ -24,7 +24,7 @@ config = {
         'Development Status :: 5 - Production/Stable',
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: BSD License',
+        'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Framework :: Django',
