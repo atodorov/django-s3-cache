@@ -13,6 +13,9 @@ Django S3 Cache
    :target: https://codeclimate.com/github/atodorov/django-s3-cache/maintainability
    :alt: Maintainability
 
+.. image:: https://tidelift.com/badges/package/pypi/django-s3-cache
+    :target: https://tidelift.com/subscription/pkg/pypi-django-s3-cache?utm_source=pypi-django-s3-cache&utm_medium=github&utm_campaign=readme
+    :alt: Tidelift
 
 This is Amazon Simple Storage Service (S3) cache backend for Django.
 It is based on the *django.core.cache.backends.filebased.FileBasedCache* backend
