@@ -75,6 +75,9 @@ class AmazonS3Cache(BaseCache):
         # sanitize location by removing leading and traling slashes
         self._options['LOCATION'] = self._location.strip('/')
 
+        self._pickle_protocol = self._options.get(
+            'PICKLE_VERSION', pickle.HIGHEST_PROTOCOL)
+
         # S3BotoStorage wants lower case names
         lowercase_options = []
         for name, value in self._options.items():
@@ -133,8 +136,8 @@ class AmazonS3Cache(BaseCache):
         if timeout is None:
             timeout = self.default_timeout
 
-        content = pickle.dumps(time.time() + timeout, pickle.HIGHEST_PROTOCOL)
-        content += pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
+        content = pickle.dumps(time.time() + timeout, self._pickle_protocol)
+        content += pickle.dumps(value, self._pickle_protocol)
         return content
 
     def delete(self, key, version=None):
