@@ -92,7 +92,7 @@ class AmazonS3Cache(BaseCache):
 
         self._storage = s3boto3.S3Boto3Storage(
             default_acl=_default_acl,
-            **self.lowercase_options
+            **lowercase_options
         )
 
     def add(self, key, value, timeout=None, version=None):
