@@ -71,9 +71,10 @@ class AmazonS3Cache(BaseCache):
 
         # we use S3 compatible varibale names while django-storages doesn't
         _default_acl = self._options.get('DEFAULT_ACL', 'private')
-        _bucket_acl = self._options.get('BUCKET_ACL', _default_acl)
+        # Comment out BUCKET_ACL for s3boto3
+        # _bucket_acl = self._options.get('BUCKET_ACL', _default_acl)
         # in case it was not specified in OPTIONS default to 'private'
-        self._options['BUCKET_ACL'] = _bucket_acl
+        # self._options['BUCKET_ACL'] = _bucket_acl
 
         self._location = self._options.get(
             'LOCATION', self._options.get('location', ''))
@@ -84,14 +85,10 @@ class AmazonS3Cache(BaseCache):
             'PICKLE_VERSION', pickle.HIGHEST_PROTOCOL)
 
         # S3BotoStorage wants lower case names
-        lowercase_options = []
+        lowercase_options = {}
         for name, value in self._options.items():
             if value:  # skip None values
-                lowercase_options.append((name.lower(), value))
-        # this avoids RuntimeError: dictionary changed size during iteration
-        # with Python 3 if we assign to the dictionary directly
-        for _n, _v in lowercase_options:
-            self._options[_n] = _v
+                lowercase_options[name.lower()] = value
 
         self._storage = s3boto3.S3Boto3Storage(
             default_acl=_default_acl,
