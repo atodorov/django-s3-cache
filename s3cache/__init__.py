@@ -18,6 +18,13 @@ from django.core.files.base import ContentFile
 from django.core.cache.backends.base import BaseCache
 
 
+S3BOTO3_ALLOWED_SETTINGS = ['access_key', 'secret_key', 'session_profile', 'file_overwrite', 'object_parameters',
+                            'bucket_name', 'querystring_auth', 'querystring_expire', 'signature_version', 'location',
+                            'custom_domain', 'cloudfront_signer', 'addressing_style', 'secure_urls',
+                            'file_name_charset', 'gzip', 'gzip_content_types', 'url_protocol', 'endpoint_url',
+                            'proxies', 'region_name', 'use_ssl', 'verify', 'max_memory_size', 'default_acl']
+
+
 def _key_to_file(key):
     """
         All files go into a single flat directory because it's not easier
@@ -84,11 +91,12 @@ class AmazonS3Cache(BaseCache):
         self._pickle_protocol = self._options.get(
             'PICKLE_VERSION', pickle.HIGHEST_PROTOCOL)
 
-        # S3BotoStorage wants lower case names
+        # S3Boto3Storage wants lower case names
         lowercase_options = {}
         for name, value in self._options.items():
-            if value:  # skip None values
-                lowercase_options[name.lower()] = value
+            if name in S3BOTO3_ALLOWED_SETTINGS:  # skip not allowed settings
+                if value:  # skip None values
+                    lowercase_options[name.lower()] = value
 
         self._storage = s3boto3.S3Boto3Storage(
             default_acl=_default_acl,
