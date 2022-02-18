@@ -70,7 +70,6 @@ class AmazonS3Cache(BaseCache):
                 'STORAGE_BUCKET_NAME', None)
 
         # we use S3 compatible varibale names while django-storages doesn't
-        _bucket_name = self._options.get('BUCKET_NAME', None)
         _default_acl = self._options.get('DEFAULT_ACL', 'private')
         _bucket_acl = self._options.get('BUCKET_ACL', _default_acl)
         # in case it was not specified in OPTIONS default to 'private'
@@ -96,7 +95,6 @@ class AmazonS3Cache(BaseCache):
 
         self._storage = s3boto3.S3Boto3Storage(
             default_acl=_default_acl,
-            bucket_name=_bucket_name,
             **self._options
         )
 
