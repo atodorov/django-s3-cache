@@ -95,8 +95,8 @@ class AmazonS3Cache(BaseCache):
             self._options[_n] = _v
 
         self._storage = s3boto3.S3Boto3Storage(
-            acl=_default_acl,
-            bucket=_bucket_name,
+            default_acl=_default_acl,
+            bucket_name=_bucket_name,
             **self._options
         )
 
