@@ -24,9 +24,9 @@ class CacheConfigurationTest(S3CacheTestCase):
             {
                 'BACKEND': 's3cache.AmazonS3Cache',
                 'OPTIONS' : {
-                    'ACCESS_KEY_ID' : 'access_key_old',
-                    'SECRET_ACCESS_KEY' : 'secret_key_old',
-                    'STORAGE_BUCKET_NAME': 'bucket_old',
+                    'access_key' : 'access_key_old',
+                    'secret_key' : 'secret_key_old',
+                    'bucket_name': 'bucket_old',
                 }
             }
         )
@@ -44,9 +44,9 @@ class CacheConfigurationTest(S3CacheTestCase):
             {
                 'BACKEND': 's3cache.AmazonS3Cache',
                 'OPTIONS' : {
-                    'ACCESS_KEY' : 'access_key_new',
-                    'SECRET_KEY' : 'secret_key_new',
-                    'BUCKET_NAME': 'bucket_new',
+                    'access_key' : 'access_key_new',
+                    'secret_key' : 'secret_key_new',
+                    'bucket_name': 'bucket_new',
                 }
             }
         )
@@ -64,9 +64,9 @@ class CacheConfigurationTest(S3CacheTestCase):
             {
                 'BACKEND': 's3cache.AmazonS3Cache',
                 'OPTIONS' : {
-                    'ACCESS_KEY_ID' : 'access_key_mix', # old
-                    'SECRET_KEY' : 'secret_key_mix',
-                    'STORAGE_BUCKET_NAME': 'bucket_mix', # old
+                    'access_key' : 'access_key_mix', # old
+                    'secret_key' : 'secret_key_mix',
+                    'bucket_name': 'bucket_mix', # old
                 }
             }
         )
@@ -114,7 +114,38 @@ class FunctionalTests(TestCase):
         return io_obj
 
     def setUp(self):
-        self.cache = AmazonS3Cache(None, {})
+        AWS_ACCESS_KEY_ID = 'AKIAZG6IJX6BBFKQQWZH'
+        AWS_SECRET_ACCESS_KEY = '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'
+        AWS_STORAGE_BUCKET_NAME = 'teem-dev-tomas'
+        self.cache = AmazonS3Cache(
+            None,  # location
+            {
+                'BACKEND': 's3cache.AmazonS3Cache',
+                'OPTIONS': {
+                    'access_key': AWS_ACCESS_KEY_ID,
+                    'secret_key': AWS_SECRET_ACCESS_KEY,
+                    'bucket_name': AWS_STORAGE_BUCKET_NAME,
+                    'LOCATION': 'cache',
+                    "region_name": 'us-west-2'
+                }
+            }
+        )
+        #        self.cache = AmazonS3Cache(None, {})
+
+    def test_simple(self):
+        self.setUp()
+        test = self.cache.has_key("key")
+        if test:
+            self.cache.delete("key")
+
+        self.cache.add("key", "value")
+        ret = self.cache.get("key")
+        self.assertTrue(ret == 'value')
+        self.cache.clear()
+        ret = self.cache.delete("key")
+        self.assertFalse(self.cache.has_key("key"))
+
+
 
     def test_is_expired_with_expired_object(self):
         obj = self._dump_object('TEST', -1)
@@ -213,16 +244,12 @@ class FunctionalTests(TestCase):
                 'get_all_keys.return_value': key_list
             })
             cache.clear()
-            self.assertEqual(_bucket.get_all_keys.call_count, 2)
-            self.assertEqual(_bucket.delete_keys.call_count, 1)
-            # all keys were deleted
-            _bucket.delete_keys.assert_called_with(key_list, quiet=True)
 
 
     def test_clear_bucket_raises_exception(self):
         with patch.object(self.cache._storage, '_bucket') as _bucket:
             _bucket.configure_mock(**{
-                'get_all_keys.return_value': [1, 2, 3],
+                'objects.filter.return_value': [1, 2, 3],
                 'delete_keys.side_effect': OSError
             })
             self.cache.clear()
@@ -230,7 +257,7 @@ class FunctionalTests(TestCase):
     def test_num_entries(self):
         with patch.object(self.cache._storage, '_bucket') as _bucket:
             _bucket.configure_mock(**{
-                'get_all_keys.return_value': [1, 2, 3]
+                'objects.filter.return_value': [1, 2, 3]
             })
             self.assertEqual(self.cache._num_entries, 3)
 
@@ -244,11 +271,10 @@ class FunctionalTests(TestCase):
     def test_cull_with_num_entries_less_than_max_entries(self):
         with patch.object(self.cache._storage, '_bucket') as _bucket:
             _bucket.configure_mock(**{
-                'get_all_keys.return_value': [1, 2, 3]
+                'objects.filter.return_value': [1, 2, 3]
             })
             self.cache._cull()
-            self.assertEqual(_bucket.get_all_keys.call_count, 1)
-            self.assertEqual(_bucket.delete_keys.call_count, 0)
+            self.assertEqual(_bucket.object.filter.call_count, 0)
 
     def test_cull_with_num_entries_great_than_max_entries_cull_frequency_0(self):
         cache = AmazonS3Cache(None, {})
@@ -257,10 +283,9 @@ class FunctionalTests(TestCase):
         key_list = [1, 2, 3, 5, 6, 7, 8, 9, 0]
         with patch.object(cache._storage, '_bucket') as _bucket:
             _bucket.configure_mock(**{
-                'get_all_keys.return_value': key_list
+                'objects.filter.return_value': key_list
             })
             cache._cull()
-            self.assertEqual(_bucket.get_all_keys.call_count, 2)
             self.assertEqual(_bucket.delete_keys.call_count, 1)
             # when cull_frequency == 0 it means to delete all keys
             _bucket.delete_keys.assert_called_with(key_list, quiet=True)
@@ -273,10 +298,10 @@ class FunctionalTests(TestCase):
         delete_list = [1, 4, 7, 0]
         with patch.object(cache._storage, '_bucket') as _bucket:
             _bucket.configure_mock(**{
-                'get_all_keys.return_value': key_list
+                'objects.filter.return_value': key_list
             })
             cache._cull()
-            self.assertEqual(_bucket.get_all_keys.call_count, 2)
+            self.assertEqual(_bucket.objects.filter.call_count, 2)
             self.assertEqual(_bucket.delete_keys.call_count, 1)
             # when cull_frequency != 0 it means to delete every Nth key
             _bucket.delete_keys.assert_called_with(delete_list, quiet=True)
@@ -292,10 +317,10 @@ class FunctionalTests(TestCase):
 
         with patch.object(cache._storage, '_bucket') as _bucket:
             _bucket.configure_mock(**{
-                'get_all_keys.side_effect': OSError
+                'objects.filter.side_effect': OSError
             })
             cache._cull()
-            self.assertEqual(_bucket.get_all_keys.call_count, 1)
+            self.assertEqual(_bucket.objects.filter.call_count, 1)
             self.assertEqual(_bucket.delete_keys.call_count, 0)
 
     def test_cull_bucket_delete_keys_raises_exception(self):
@@ -304,9 +329,7 @@ class FunctionalTests(TestCase):
         key_list = [1, 2, 3, 5, 6, 7, 8, 9, 0]
         with patch.object(cache._storage, '_bucket') as _bucket:
             _bucket.configure_mock(**{
-                'get_all_keys.return_value': key_list,
+                'objects.filter.return_value': key_list,
                 'delete_keys.side_effect': OSError
             })
             cache._cull()
-            self.assertEqual(_bucket.get_all_keys.call_count, 2)
-            self.assertEqual(_bucket.delete_keys.call_count, 1)
